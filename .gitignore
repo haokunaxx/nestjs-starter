@@ -1,6 +1,9 @@
 #ignores directory
 mock
 
+# DB FILE
+development.sqlite
+test.sqlite
 # compiled output
 /dist
 /node_modules

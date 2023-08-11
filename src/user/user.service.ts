@@ -8,7 +8,12 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UserService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
 
-  async createUser(createUserData: CreateUserDto) {
-    console.log(createUserData);
+  async create(createData: CreateUserDto) {
+    const user = await this.repo.create(createData);
+    this.repo.save(user);
+  }
+
+  find(email: string) {
+    return this.repo.findBy({ email });
   }
 }
