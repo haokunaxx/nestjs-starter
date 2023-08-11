@@ -1,3 +1,6 @@
+#ignores directory
+mock
+
 # compiled output
 /dist
 /node_modules

@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
+import User from './user/user.entity';
 @Module({
   imports: [
     AuthModule,
@@ -25,10 +26,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           type: 'sqlite',
           database: config.get<string>('DB_NAME'),
           synchronize: true,
-          entities: [],
+          entities: [User],
         };
       },
     }),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
