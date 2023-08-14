@@ -1,11 +1,19 @@
-import { Module, ValidationPipe } from '@nestjs/common';
-import { APP_PIPE } from '@nestjs/core';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  ValidationPipe,
+} from '@nestjs/common';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import User from './user/user.entity';
+import { AuthMiddleware } from './middlewares/auth.middleware';
+import { AuthGuards } from './guards/auth.guards';
 @Module({
   imports: [
     // TypeOrmModule.forRoot({
@@ -29,11 +37,35 @@ import User from './user/user.entity';
         };
       },
     }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('SECRET'),
+        // verifyOptions: {
+        //   ignoreExpiration: false,
+        // },
+        signOptions: {
+          expiresIn: '1000s',
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    // JwtModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     secret: configService.get<string>('SECRET'),
+    //   }),
+    //   inject: [ConfigService],
+    // }),
     UserModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuards,
+    },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
@@ -42,4 +74,8 @@ import User from './user/user.entity';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes('*');
+  }
+}
