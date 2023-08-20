@@ -1,5 +1,6 @@
 #ignores directory
-mock
+/mock
+/static
 
 # DB FILE
 development.sqlite

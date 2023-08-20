@@ -11,9 +11,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
-import User from './user/user.entity';
 import { AuthMiddleware } from './middlewares/auth.middleware';
 import { AuthGuards } from './guards/auth.guards';
+import { UploadModule } from './upload/upload.module';
+
+// Entity
+import User from './user/user.entity';
+import Upload from './upload/upload.entity';
+
 @Module({
   imports: [
     // TypeOrmModule.forRoot({
@@ -33,7 +38,7 @@ import { AuthGuards } from './guards/auth.guards';
           type: 'sqlite',
           database: config.get<string>('DB_NAME'),
           synchronize: true,
-          entities: [User],
+          entities: [User, Upload],
         };
       },
     }),
@@ -58,6 +63,7 @@ import { AuthGuards } from './guards/auth.guards';
     //   inject: [ConfigService],
     // }),
     UserModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [
